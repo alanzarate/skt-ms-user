@@ -1,0 +1,61 @@
+server:
+  port: 7982
+
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: skt-ms-user
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  zipkin:
+    base-url: ${ZIPKIN_URL:http://localhost:9910}
+    locator:
+      discovery:
+        enabled: false
+
+keycloak-custom:
+  master-access-key: ${MASTER_ACCESS_KEY}
+  master-secret-key: ${MASTER_SECRET_KEY}
+  realm: ${REALM_KEYCLOAK}
+
+keycloak:
+  config:
+    import: optional:file:.env[.properties]
+  realm: ${REALM_KEYCLOAK}
+  auth-server-url: ${URL_KEYCLOAK:http://localhost:8080}
+  autodetect-bearer-only: true
+  ssl-required: none
+  resource: ${RESOURCE_KEYCLOAK}
+  credentials:
+    secret: ${SECRET_CREDENTIAL_KEYCLOAK}
+  use-resource-role-mappings: false
+  security-constraints:
+    - auth-roles:
+        - USER
+      security-collections:
+        - name: SOME USER SERVICE
+          methods:
+            - GET
+            - POST
+            - PUT
+          patterns:
+            - /api/v1/user/*
+    - auth-roles:
+        - ADMIN
+      security-collections:
+        - name: SOME ADMIN SERVICE
+          methods:
+            - PUT
+            - GET
+            - POST
+          patterns:
+            - /api/v1/admin/*
+
