@@ -61,6 +61,7 @@ class KeycloakBl @Autowired constructor(
 
     fun getUserInfoFromKeycloak(userId: String): KeycloakUserDto {
         val masterToken = getKeycloakDtoMaster()
+        logger.info("#getUserInfoFromKeycloak: solicita informacion de keycloak, fue a API-KEYCLOAK")
         return keycloakService.getUserInformation(
             "Bearer ${masterToken.access_token}",
             userId

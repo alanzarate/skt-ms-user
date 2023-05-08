@@ -1,6 +1,7 @@
 server:
   port: 7982
 
+
 spring:
   config:
     import: optional:file:.env[.properties]
@@ -14,7 +15,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-
+logs:
+  url: 67.205.142.137:5000
   zipkin:
     base-url: ${ZIPKIN_URL:http://localhost:9910}
     locator:

@@ -7,6 +7,8 @@
 
     <springProperty scope="context" name="application" source="spring.application.name" defaultValue="micro-service-user"/>
     <springProperty scope="context" name="port" source="server.port" defaultValue="0000"/>
+    <springProperty scope="context" name="logback_uri" source="logs.url" defaultValue="67.205.142.137:5000"/>
+
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>directory_to_ignore/logs/${application}/${application}-${port}.log</file>
@@ -29,7 +31,7 @@
     </appender>
 
     <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>localhost:5000</destination>
+        <destination>${logback_uri}</destination>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
                 <mdc />

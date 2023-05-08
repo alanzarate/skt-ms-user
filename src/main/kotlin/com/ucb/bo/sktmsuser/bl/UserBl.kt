@@ -9,6 +9,8 @@ import com.ucb.bo.sktmsuser.entity.UserEntity
 import com.ucb.bo.sktmsuser.model.CustomException
 import lombok.AllArgsConstructor
 import lombok.NoArgsConstructor
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.rest.webmvc.ResourceNotFoundException
 import org.springframework.http.HttpStatus
@@ -25,18 +27,20 @@ class UserBl @Autowired constructor(
     private val addressDao: AddressDao,
 
 ){
-
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun getUserInformation(token: String): ResponseDto<Any> {
         try {
             val userIdToken = keycloakBl.getKeycloakIdFromToken(token);
             val userInDb = userDao.findByUserUuid(userIdToken);
             // if there is data in list, means that main db contains the user
-            if (userInDb.isNotEmpty())
+            if (userInDb.isNotEmpty()) {
+                logger.info("#getUserInformation: usuario ${userInDb[0].userId} + ${userInDb[0].userUuid} encontrado en la base de datos")
                 return ResponseDto(userInDb[0], null, true)
-
+            }
             // the user is not in main db
             // check for user in keycloak db
+            logger.info("#getUserInformation: no encontrado en la base de datos - pero si por api keycloak $userIdToken")
             val userKeycloak = keycloakBl.getUserInfoFromKeycloak(userIdToken);
             // save the user information in db
             val userEntity = UserEntity(
