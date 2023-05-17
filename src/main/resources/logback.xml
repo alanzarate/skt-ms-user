@@ -7,7 +7,7 @@
 
     <springProperty scope="context" name="application" source="spring.application.name" defaultValue="micro-service-user"/>
     <springProperty scope="context" name="port" source="server.port" defaultValue="0000"/>
-    <springProperty scope="context" name="logback_uri" source="logs.url" defaultValue="67.205.142.137:5000"/>
+    <springProperty scope="context" name="logback_uri" source="custom-config.logs-uri" defaultValue="67.205.142.137:5000"/>
 
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">

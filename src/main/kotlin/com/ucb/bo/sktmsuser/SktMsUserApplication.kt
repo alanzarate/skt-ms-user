@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients
 
 @SpringBootApplication
 @EnableFeignClients
-//@EnableDiscoveryClient
+@EnableDiscoveryClient
 class SktMsUserApplication
 
 fun main(args: Array<String>) {

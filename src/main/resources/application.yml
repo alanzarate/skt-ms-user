@@ -1,7 +1,5 @@
 server:
-  port: 7982
-
-
+  port: ${SKT_MS_USER_PORT:7982} #7982
 spring:
   config:
     import: optional:file:.env[.properties]
@@ -9,21 +7,29 @@ spring:
     name: skt-ms-user
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
-logs:
-  url: 67.205.142.137:5000
   zipkin:
     base-url: ${ZIPKIN_URL:http://localhost:9910}
     locator:
       discovery:
-        enabled: false
+        enabled: true
 
-keycloak-custom:
+eureka:
+  config:
+    import: optional:file:.env[.properties]
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: ${EUREKA_URL:http://localhost:8707/eureka/}
+
+custom-config:
+  logs-uri: ${LOGS_URI}
   master-access-key: ${MASTER_ACCESS_KEY}
   master-secret-key: ${MASTER_SECRET_KEY}
   realm: ${REALM_KEYCLOAK}

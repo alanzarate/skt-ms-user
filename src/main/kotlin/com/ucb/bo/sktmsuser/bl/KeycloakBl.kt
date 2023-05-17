@@ -21,10 +21,10 @@ class KeycloakBl @Autowired constructor(
     private val keycloakService: KeycloakService,
 ){
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
-    @Value("\${keycloak-custom.master-access-key}")
+    @Value("\${custom-config.master-access-key}")
     lateinit var username: String
 
-    @Value("\${keycloak-custom.master-secret-key}")
+    @Value("\${custom-config.master-secret-key}")
     lateinit var password: String
 
     fun getKeycloakIdFromToken(token: String): String{
