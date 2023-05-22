@@ -2,7 +2,10 @@ package com.ucb.bo.sktmsuser.controller
 
 import com.ucb.bo.sktmsuser.bl.UserBl
 import com.ucb.bo.sktmsuser.dto.AddressDto
+import com.ucb.bo.sktmsuser.dto.CardDto
 import com.ucb.bo.sktmsuser.dto.ResponseDto
+import com.ucb.bo.sktmsuser.exception.AuthenticationException
+import com.ucb.bo.sktmsuser.exception.ParameterException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -83,6 +86,129 @@ class UserController (
     ): ResponseEntity<ResponseDto<Any>>{
         val token = headers["authorization"]!!.substring(7)
         return userBl.getAddressForUser( userId, token)
+    }
+
+
+
+    @GetMapping("/{userId}/cards")
+    fun getCardsOfUser(
+        @RequestHeader headers: Map<String, String> ,
+        @PathVariable userId: Long
+    ): ResponseEntity<ResponseDto<Any>>{
+        val token = headers["authorization"]!!.substring(7)
+        try{
+            val res = userBl.getCardsOfUser( userId, token)
+            return ResponseEntity
+                .ok()
+                .body(
+                    ResponseDto( res,null, true)
+                )
+        }catch (aex: AuthenticationException){
+            logger.info("Usuario no authorizado accediendo a registros de tercer los disenios ${userBl.getSubjectOfToken(token)}")
+            return ResponseEntity
+                .badRequest()
+                .body(
+                    ResponseDto(null, aex.message, false )
+                )
+        }catch (ex: Exception){
+            logger.info("Ocurrio una exception consiguiendo una tarjeta ${ex.message}")
+            return ResponseEntity
+                .badRequest()
+                .body(
+                    ResponseDto(null, ex.message, false )
+                )
+        }
+
+    }
+
+    @PostMapping("/{userId}/cards")
+    fun createCard(
+        @RequestHeader headers: Map<String, String> ,
+        @PathVariable userId: Long,
+        @RequestBody body: CardDto
+    ): ResponseEntity<ResponseDto<Any>>{
+        val token = headers["authorization"]!!.substring(7)
+        try{
+            val res = userBl.createNewCard( userId, body, token)
+            return ResponseEntity
+                .ok()
+                .body(
+                    ResponseDto( res,"Created Successfully", true)
+                )
+        }catch (aex: AuthenticationException) {
+            logger.info(
+                "Usuario no authorizado accediendo a registros de tercer los disenios ${
+                    userBl.getSubjectOfToken(
+                        token
+                    )
+                }"
+            )
+            return ResponseEntity
+                .badRequest()
+                .body(
+                    ResponseDto(null, aex.message, false)
+                )
+        }catch (pex: ParameterException){
+            logger.info("Ocurrio una exception consiguiendo una tarjeta ${pex.message}")
+            return ResponseEntity
+                .badRequest()
+                .body(
+                    ResponseDto(null, pex.message, false )
+                )
+        }catch (ex: Exception){
+            logger.info("Ocurrio una exception consiguiendo una tarjeta ${ex.message}")
+            return ResponseEntity
+                .badRequest()
+                .body(
+                    ResponseDto(null, ex.message, false )
+                )
+        }
+
+    }
+
+    @DeleteMapping("/{userId}/cards/{cardId}")
+    fun deleteCard(
+        @RequestHeader headers: Map<String, String> ,
+        @PathVariable userId: Long,
+        @PathVariable cardId: Long,
+    ): ResponseEntity<ResponseDto<Any>>{
+        val token = headers["authorization"]!!.substring(7)
+        try{
+            val res = userBl.deleteLogicalCard( userId, cardId, token)
+            return ResponseEntity
+                .ok()
+                .body(
+                    ResponseDto( res,"Deleted Successfully", true)
+                )
+        }catch (aex: AuthenticationException) {
+            logger.info(
+                "Usuario no authorizado accediendo a registros de tercer los disenios ${
+                    userBl.getSubjectOfToken(
+                        token
+                    )
+                }"
+            )
+            return ResponseEntity
+                .badRequest()
+                .body(
+                    ResponseDto(null, aex.message, false)
+                )
+        }catch (pex: ParameterException){
+            logger.info("Ocurrio una exception consiguiendo una tarjeta ${pex.message}")
+            return ResponseEntity
+                .badRequest()
+                .body(
+                    ResponseDto(null, pex.message, false )
+                )
+        }catch (ex: Exception){
+            logger.info("Ocurrio una exception consiguiendo una tarjeta ${ex.message}")
+            return ResponseEntity
+                .badRequest()
+                .body(
+                    ResponseDto(null, ex.message, false )
+                )
+        }
+
     }
 
 

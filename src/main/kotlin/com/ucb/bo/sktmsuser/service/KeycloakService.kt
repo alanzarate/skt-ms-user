@@ -1,6 +1,7 @@
 package com.ucb.bo.sktmsuser.service
 
 import com.ucb.bo.sktmsuser.config.ConfigFeignClient
+import com.ucb.bo.sktmsuser.dto.KcRolesDto
 import com.ucb.bo.sktmsuser.dto.KeycloakTokenDto
 import com.ucb.bo.sktmsuser.dto.KeycloakUserDto
 import feign.Headers
@@ -30,5 +31,23 @@ interface KeycloakService {
 
     @PutMapping(value = ["/admin/realms/\${keycloak.realm}/users/{user-id}"], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun updateUserInfo(@RequestHeader("Authorization") token: String, @PathVariable(value = "user-id") userId: String, @RequestBody body:Map<String, *>)
+
+    @GetMapping(value= ["/admin/realms/\${keycloak.realm}/users"], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    fun getAllUsersInformation(@RequestHeader("Authorization") token: String): List<KeycloakUserDto>
+
+    @GetMapping(value= ["/admin/realms/\${keycloak.realm}/roles"] , consumes = [MediaType.APPLICATION_JSON_VALUE])
+    fun getAllRolesInRealm(@RequestHeader("Authorization") token: String): List<KcRolesDto>
+
+    /*
+    { "type": "password",
+     "temporary": false,
+     "value": "NEW_PASSWORD"
+    }
+     */
+    @PutMapping(value = ["/admin/realms/\${keycloak.realm}/users/{user-id}/reset-password"], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    fun changePasswordOfUser(@RequestHeader("Authorization") token: String,
+                             @PathVariable(value = "user-id") userId: String,
+                             @RequestBody body:Map<String, *>)
+
 
 }

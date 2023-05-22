@@ -3,9 +3,13 @@ package com.ucb.bo.sktmsuser.bl
 import com.ucb.bo.sktmsuser.dao.AddressDao
 import com.ucb.bo.sktmsuser.dao.UserDao
 import com.ucb.bo.sktmsuser.dto.AddressResponseDto
+import com.ucb.bo.sktmsuser.dto.CardDto
 import com.ucb.bo.sktmsuser.dto.ResponseDto
 import com.ucb.bo.sktmsuser.entity.AddressEntity
+import com.ucb.bo.sktmsuser.entity.CardEntity
 import com.ucb.bo.sktmsuser.entity.UserEntity
+import com.ucb.bo.sktmsuser.exception.AuthenticationException
+import com.ucb.bo.sktmsuser.exception.ParameterException
 import com.ucb.bo.sktmsuser.model.CustomException
 import lombok.AllArgsConstructor
 import lombok.NoArgsConstructor
@@ -23,6 +27,7 @@ import org.springframework.stereotype.Service
 @NoArgsConstructor
 class UserBl @Autowired constructor(
     private val keycloakBl: KeycloakBl,
+    private val cardBl: CardBl,
     private val userDao: UserDao,
     private val addressDao: AddressDao,
 
@@ -76,12 +81,15 @@ class UserBl @Autowired constructor(
     }
 
     fun validateUserIdAndToken(userId: Long, token: String): UserEntity?{
-        val userIdToken = keycloakBl.getKeycloakIdFromToken(token);
+        val userIdToken = getSubjectOfToken(token)
         val userInDb = userDao.findByUserUuid(userIdToken);
         if (userInDb.isEmpty()) return null
         val currentUser = userInDb[0]
         if(userId != currentUser.userId) return null
         return currentUser
+    }
+    fun getSubjectOfToken(token: String):String{
+        return keycloakBl.getKeycloakIdFromToken(token)
     }
 
     fun createNewAddressForUser(userId: Long, token: String, address: String, latitude: Double, longitude: Double): ResponseEntity<ResponseDto<Any>>{
@@ -146,4 +154,31 @@ class UserBl @Autowired constructor(
 
         return ResponseEntity(ResponseDto(listAdd, null, true) , HttpStatus.OK)
     }
+
+    fun getCardsOfUser(userId: Long, token: String): ArrayList<CardEntity> {
+        val currentUser = validateUserIdAndToken(userId, token)
+            ?: throw AuthenticationException("UNAUTHORIZED")
+        return cardBl.getCardsByUser(currentUser)
+
+    }
+
+    fun createNewCard(userId: Long, body: CardDto, token: String): CardEntity {
+        val currentUser = validateUserIdAndToken(userId, token)
+            ?: throw AuthenticationException("UNAUTHORIZED")
+        if (body.dateExp == null || body.lastNumber == null)
+            throw ParameterException("Bad Request")
+
+        val res = cardBl.createCardWithUser(body, currentUser)
+        logger.info("Card created successfully ${res.cardId} for user ${currentUser.userId}")
+        return res
+    }
+
+    fun deleteLogicalCard(userId: Long, cardId: Long, token: String ): CardEntity {
+        val currentUser = validateUserIdAndToken(userId, token)
+            ?: throw AuthenticationException("UNAUTHORIZED")
+        val res = cardBl.deleteLogical(currentUser, cardId)
+        logger.info("Card deleted logical successfully ${res.cardId} for user ${currentUser.userId}")
+        return res
+    }
+
 }

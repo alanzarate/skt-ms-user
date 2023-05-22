@@ -54,6 +54,7 @@ keycloak:
             - GET
             - POST
             - PUT
+            - DELETE
           patterns:
             - /api/v1/user/*
     - auth-roles:
