@@ -6,7 +6,7 @@ import javax.persistence.*
 @Table(name = "SKT_USER")
 class UserEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name="user_id")
     var userId: Long = 0,
     var name: String,
