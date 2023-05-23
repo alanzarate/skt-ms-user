@@ -16,7 +16,7 @@ class CardBl @Autowired constructor(
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
 
-    fun getCardsByUser(currentUser: UserEntity): ArrayList<CardEntity> {
+    fun getCardsByUser(currentUser: UserEntity): List<CardEntity> {
         return ArrayList(cardDao.findByUserEntity(currentUser) )
     }
     fun createCardWithUser(body: CardDto, user: UserEntity): CardEntity {

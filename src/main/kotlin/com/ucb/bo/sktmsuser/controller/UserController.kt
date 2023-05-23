@@ -22,28 +22,57 @@ class UserController (
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     /*
-    READ: this function gets the information about a user, based on token
+    GET /api/v1/user/information
+
+    - this function gets the information about a user, based on token
     first checks the main db, if not found, then checks keycloak db and save in main-db
+
+     RESPONSE BODY:address/new
+     {
+        "userId": (Long),
+        "name": (String),
+        "available": (Boolean),
+        "lastname": (String),
+        "emailAddress": (String),
+        "identityProvider": (String ?),
+        "userUuid" : (String),
+        "cel": (String ?)
+     }
+
+
      */
     @GetMapping("/information")
     fun getUserInformation(
-        @RequestHeader headers: Map<String, String> ,
-        @RequestParam customQuery:Map<String, String>
-    ): ResponseEntity<ResponseDto<*>>{
+        @RequestHeader headers: Map<String, String>,
+        @RequestParam customQuery: Map<String, String>
+    ): ResponseEntity<ResponseDto<*>> {
         val token = headers["authorization"]?.substring(7)
             ?: return ResponseEntity(
                 ResponseDto(null, "Parametro 'authorization' ausente", false),
-                HttpStatus.FORBIDDEN)
+                HttpStatus.FORBIDDEN
+            )
         logger.info("#getUserInformation: El usuario requiere su propia informacion")
 
         return ResponseEntity(
-            userBl.getUserInformation(token) ,
-            HttpStatus.OK)
+            userBl.getUserInformation(token),
+            HttpStatus.OK
+        )
 
     }
 
+    /*
+    PUT /api/v1/user/{userId}/information/update
 
-
+    REQUEST BODY:
+    {
+        "firstname": (String),
+        "lastname": (String),
+        "email": (String),
+        "cel": (String)
+    }
+    NOTE: Mandatory all params, if not to update just send "null"
+    Ex. "lastname": null
+     */
     @PutMapping("/{userId}/information/update")
     fun updateUserInformation(
         @PathVariable userId: Long,
@@ -56,6 +85,20 @@ class UserController (
             body["firstname"] as String?, body["lastname"] as String?, body["email"] as String? , body["cel"] as String?  )
     }
 
+    /*
+    ----- create new address for a specific user
+    POST /api/v1/user/{userId}/address/new
+
+    REQUEST BODY:
+    {
+        "address": String,
+        "latitude": Double,
+        "longitude": Double,
+    }
+
+
+     */
+
     @PostMapping("/{userId}/address/new")
     fun createNewAddressForUser(
         @RequestBody body: AddressDto,
@@ -66,6 +109,21 @@ class UserController (
         return userBl.createNewAddressForUser( userId, token ,
             body.address, body.latitude,  body.longitude )
     }
+
+    /*
+    ----- edit an existent address for a specific user
+    PUT /api/v1/user/{userId}/address/{id}
+
+    REQUEST BODY:
+    {
+        "address": String,
+        "latitude": Double,
+        "longitude": Double,
+    }
+
+
+     */
+
 
     @PutMapping("/{userId}/address/{id}")
     fun editAddressById(
@@ -79,6 +137,21 @@ class UserController (
             body.address, body.latitude,  body.longitude , id)
     }
 
+
+    /*
+    --- get all address for a user
+    GET /api/v1/user/{userId}/address/all
+    RESPONSE BODY:
+    [
+        {
+        addressId: Long?,
+        address: String?,
+        available: Boolean?,
+        latitude: Double?,
+        longitude: Double?,
+        }
+    ]
+     */
     @GetMapping("/{userId}/address/all")
     fun getAddressForUser(
         @RequestHeader headers: Map<String, String> ,
@@ -89,7 +162,17 @@ class UserController (
     }
 
 
-
+    /*
+        --- get all cards for a user
+        GET /api/v1/user/{userId}/cards
+        RESPONSE BODY:
+        [
+            {
+                dateExp: Date,
+                lastNumber: String,
+            }
+        ]
+         */
     @GetMapping("/{userId}/cards")
     fun getCardsOfUser(
         @RequestHeader headers: Map<String, String> ,
@@ -121,6 +204,17 @@ class UserController (
 
     }
 
+    /*
+        --- CREATE a card for a user
+        POST /api/v1/user/{userId}/cards
+        REQUEST BODY:
+
+            {
+                dateExp: Date,
+                lastNumber: String,
+            }
+
+         */
     @PostMapping("/{userId}/cards")
     fun createCard(
         @RequestHeader headers: Map<String, String> ,
@@ -166,6 +260,12 @@ class UserController (
 
     }
 
+    /*
+        --- delete a card for a user
+        DELETE /api/v1/user/{userId}/cards/{cardId}
+
+
+         */
     @DeleteMapping("/{userId}/cards/{cardId}")
     fun deleteCard(
         @RequestHeader headers: Map<String, String> ,

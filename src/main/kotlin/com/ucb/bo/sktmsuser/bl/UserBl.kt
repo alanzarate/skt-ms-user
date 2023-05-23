@@ -155,10 +155,19 @@ class UserBl @Autowired constructor(
         return ResponseEntity(ResponseDto(listAdd, null, true) , HttpStatus.OK)
     }
 
-    fun getCardsOfUser(userId: Long, token: String): ArrayList<CardEntity> {
+    fun getCardsOfUser(userId: Long, token: String): ArrayList<CardDto> {
         val currentUser = validateUserIdAndToken(userId, token)
             ?: throw AuthenticationException("UNAUTHORIZED")
-        return cardBl.getCardsByUser(currentUser)
+        val currentCardsOfUser:ArrayList<CardDto> = ArrayList()
+        cardBl.getCardsByUser(currentUser).forEach {
+            value -> currentCardsOfUser.add(
+                CardDto(
+                    dateExp = value.dateExp,
+                    lastNumber = value.lastNumber
+                )
+            )
+        }
+        return currentCardsOfUser
 
     }
 
