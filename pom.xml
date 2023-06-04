@@ -78,7 +78,7 @@
 			<version>2.2.0</version>
 		</dependency>
 
-		<!-- SLEUTH AND ZIPKIN
+		<!-- SLEUTH AND ZIPKIN -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-sleuth-zipkin</artifactId>
@@ -88,7 +88,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-sleuth</artifactId>
 		</dependency>
-		-->
+
 
 		<!-- SLf4J -->
 		<dependency>
@@ -121,7 +121,7 @@
 		</dependency>
 
 
-		<!-- https://mvnrepository.com/artifact/net.logstash.logback/logstash-logback-encoder -->
+		<!-- LOGBACK FOR LOGSTASH -->
 		<dependency>
 			<groupId>net.logstash.logback</groupId>
 			<artifactId>logstash-logback-encoder</artifactId>
